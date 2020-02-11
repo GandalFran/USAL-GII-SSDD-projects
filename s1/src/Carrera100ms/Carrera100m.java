@@ -19,7 +19,6 @@ public class Carrera100m extends Carrera{
 	}
 	
 	public static void correr(Atleta100m [] atletas) {
-		
 		try {
 			System.out.println("preparados");
 			Thread.sleep(1000);
@@ -29,8 +28,8 @@ public class Carrera100m extends Carrera{
 			for(Atleta100m a : atletas)
 				a.start();
 			atletas[0].getInicio().release(atletas.length);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} catch (InterruptedException ex) {
+			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + ex.toString());
 		}
 	}
 }
