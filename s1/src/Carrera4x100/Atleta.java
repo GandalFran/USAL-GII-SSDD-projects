@@ -1,6 +1,7 @@
 package Carrera4x100;
 
 import java.util.Random;
+import java.util.concurrent.Semaphore;
 
 public class Atleta extends Thread{
 
@@ -8,19 +9,22 @@ public class Atleta extends Thread{
 	private static final int MAX_SLEEP_MS = 11;
 
 	private String nombre;
-	
-	public Atleta(String nombre){
+	private Semaphore testigo;
+
+	public Atleta(String nombre, Semaphore testigo) {
+		super();
 		this.nombre = nombre;
+		this.testigo = testigo;
 	}
 
 	@Override
 	public void run() {
 		try {
-			Carrera.TESTIGO.acquire();
+			this.testigo.acquire();
 			this.mySleep();
-			Carrera.TESTIGO.release();
-		}catch(InterruptedException e) {
-			e.printStackTrace();
+			this.testigo.release();
+		}catch(InterruptedException ex) {	
+			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + ex.toString());
 		}
 	}
 	
@@ -30,7 +34,7 @@ public class Atleta extends Thread{
 	
 	private void mySleep() throws InterruptedException{
 		int sleepInterval = this.getSleepInterval();
-		System.out.printf("\n[%s] running for %d ms", this.nombre, sleepInterval);
+		System.out.printf("\n[%s] running for %d ms. tiempo: %d", this.nombre, sleepInterval, System.currentTimeMillis());
 		Thread.sleep(sleepInterval);
 	}
 	
@@ -42,4 +46,12 @@ public class Atleta extends Thread{
 		this.nombre = nombre;
 	}
 
+	public Semaphore getTestigo() {
+		return testigo;
+	}
+
+	public void setTestigo(Semaphore testigo) {
+		this.testigo = testigo;
+	}
+	
 }

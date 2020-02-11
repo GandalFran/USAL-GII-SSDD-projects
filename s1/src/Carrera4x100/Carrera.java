@@ -3,20 +3,16 @@ import java.util.concurrent.Semaphore;
 
 public class Carrera{
 	
-	public static final Semaphore TESTIGO = new Semaphore(1);
-	
-	public static void correr(Atleta [] atletas) {
-		System.out.println("corriendo");
-		try {
-			TESTIGO.acquire();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
-		for(Atleta a : atletas)
-			a.start();
-
-		TESTIGO.release();
+	public static Atleta [] buildAtletas(int numAtletas) {
+		Atleta [] atletas = new Atleta[numAtletas];
+		Semaphore testigo = new Semaphore(1);
+		for(int id = 0; id < numAtletas; id++)
+			atletas[id] = new Atleta(String.format("Atleta %d",id), testigo);
+		return atletas;
 	}
 	
+	public static void correr(Atleta [] atletas) {
+		for(Atleta a : atletas)
+			a.start();
+	}
 }

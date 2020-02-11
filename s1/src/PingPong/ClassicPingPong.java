@@ -1,32 +1,31 @@
 package PingPong;
 
-public class ClassicPingPong extends Thread{
+import java.util.concurrent.Semaphore;
 
-	private final static int MAX_ITERATIONS = 3000;
+public class ClassicPingPong extends Thread{	
+
+	protected String word;
+	protected int numIterations;
 	
-	private String word;
-	
-	public ClassicPingPong(String word) {
+	public ClassicPingPong(String word, int numIterations) {
 		super();
 		this.word = word;
+		this.numIterations = numIterations;
+	}
+	
+	public static ClassicPingPong[] producePlayers(int numIterations) {
+		return new ClassicPingPong [] {
+				new ClassicPingPong("p", numIterations),
+				new ClassicPingPong("P", numIterations)
+		};
 	}
 	
 	@Override
 	public void run() {
-		synchronized(this.getClass()) {
-			for(int i=0; i< this.MAX_ITERATIONS; i++) {
-				System.out.print(this.word);
-				System.out.flush();
-				this.getClass().notifyAll();
-				try {
-					this.getClass().wait();
-				}catch(InterruptedException ex) {
-					
-				}
-			}
-			this.notifyAll();
+		for(int i=0; i< this.numIterations; i++) {
+			System.out.print(this.word);
+			System.out.flush();
 		}
-		
 	}
 
 	public String getWord() {
@@ -36,5 +35,5 @@ public class ClassicPingPong extends Thread{
 	public void setWord(String word) {
 		this.word = word;
 	}
-
+	
 }
