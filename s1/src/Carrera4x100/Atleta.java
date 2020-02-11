@@ -8,12 +8,12 @@ public class Atleta extends Thread{
 	private static final int MIN_SLEEP_MS = 9;
 	private static final int MAX_SLEEP_MS = 11;
 
-	private String nombre;
+	protected String dorsal;
 	private Semaphore testigo;
 
-	public Atleta(String nombre, Semaphore testigo) {
+	public Atleta(String dorsal, Semaphore testigo) {
 		super();
-		this.nombre = nombre;
+		this.dorsal = dorsal;
 		this.testigo = testigo;
 	}
 
@@ -21,7 +21,8 @@ public class Atleta extends Thread{
 	public void run() {
 		try {
 			this.testigo.acquire();
-			this.mySleep();
+			this.correr();
+			System.out.printf("\n[%s] tiempo: %d", this.dorsal, System.currentTimeMillis());
 			this.testigo.release();
 		}catch(InterruptedException ex) {	
 			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + ex.toString());
@@ -32,18 +33,17 @@ public class Atleta extends Thread{
 		return new Random().nextInt(Atleta.MAX_SLEEP_MS - Atleta.MIN_SLEEP_MS + 1) + Atleta.MIN_SLEEP_MS;
 	}
 	
-	private void mySleep() throws InterruptedException{
+	protected void correr() throws InterruptedException{
 		int sleepInterval = this.getSleepInterval();
-		System.out.printf("\n[%s] running for %d ms. tiempo: %d", this.nombre, sleepInterval, System.currentTimeMillis());
 		Thread.sleep(sleepInterval);
 	}
 	
-	public String getNombre() {
-		return nombre;
+	public String getDorsal() {
+		return dorsal;
 	}
 
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
+	public void setDorsal(String dorsal) {
+		this.dorsal = dorsal;
 	}
 
 	public Semaphore getTestigo() {
