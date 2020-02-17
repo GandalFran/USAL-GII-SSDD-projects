@@ -23,7 +23,7 @@ public class Atleta100m extends Atleta{
 		try {
 			this.inicio.acquire();
 			this.correr();
-			Carrera.meta(this);
+			Carrera100m.meta(this);
 		} catch (InterruptedException ex) {
 			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + ex.toString());
 		}

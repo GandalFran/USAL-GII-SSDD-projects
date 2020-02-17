@@ -20,7 +20,11 @@ public class Carrera100m extends Carrera{
 	}
 	
 	public static void meta(Atleta100m atleta){
-		atleta.getMeta().acquire();
+		try {
+			atleta.getMeta().acquire();
+		} catch (InterruptedException ex) {
+			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + ex.toString());
+		}
 		System.out.printf("\n[%s] tiempo: %d", atleta.getDorsal(), System.currentTimeMillis());
 		System.out.flush();
 		atleta.getMeta().release();
@@ -37,7 +41,7 @@ public class Carrera100m extends Carrera{
 			for(Atleta100m a : atletas)
 				a.start();
 			atletas[0].getInicio().release(atletas.length);
-			atletas[0].getCarreraNotifier().acquire(atletas.lenth);
+			atletas[0].getCarreraNotifier().acquire(atletas.length);
 		} catch (InterruptedException ex) {
 			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + ex.toString());
 		}
