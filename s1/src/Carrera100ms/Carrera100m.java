@@ -12,9 +12,10 @@ public class Carrera100m extends Carrera{
 		Atleta100m [] atletas = new Atleta100m[numAtletas];
 		Semaphore inicio = new Semaphore(0);
 		Semaphore meta = new Semaphore(1);
+		Semaphore carreraNotifier = new Semaphore(0);
 		
 		for(int id = 0; id < numAtletas; id++)
-			atletas[id] = new Atleta100m(String.format("Atleta %d",id), inicio, meta);
+			atletas[id] = new Atleta100m(String.format("Atleta %d",id), inicio, meta, carreraNotifier);
 		return atletas;
 	}
 	
@@ -23,6 +24,7 @@ public class Carrera100m extends Carrera{
 		System.out.printf("\n[%s] tiempo: %d", atleta.getDorsal(), System.currentTimeMillis());
 		System.out.flush();
 		atleta.getMeta().release();
+		atleta.getCarreraNotifier().release(1);
 	}
 	
 	public static void correr(Atleta100m [] atletas) {
@@ -35,6 +37,7 @@ public class Carrera100m extends Carrera{
 			for(Atleta100m a : atletas)
 				a.start();
 			atletas[0].getInicio().release(atletas.length);
+			atletas[0].getCarreraNotifier().acquire(atletas.lenth);
 		} catch (InterruptedException ex) {
 			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + ex.toString());
 		}
