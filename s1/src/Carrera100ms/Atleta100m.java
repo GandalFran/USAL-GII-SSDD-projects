@@ -9,11 +9,13 @@ public class Atleta100m extends Atleta{
 
 	private Semaphore meta;
 	private Semaphore inicio;
+	private Semaphore carreraNotifier;
 	
-	public Atleta100m(String dorsal, Semaphore testigo, Semaphore meta) {
+	public Atleta100m(String dorsal, Semaphore testigo, Semaphore meta, Semaphore carreraNotifier) {
 		super(dorsal, testigo);
 		this.meta = meta;
 		this.inicio = testigo;
+		this.carreraNotifier = carreraNotifier;
 	}
 
 	@Override
@@ -42,8 +44,13 @@ public class Atleta100m extends Atleta{
 	public void setInicio(Semaphore inicio) {
 		this.inicio = inicio;
 	}
+	
+	public Semaphore getCarreraNotifier() {
+		return carreraNotifier;
+	}
 
-
-		
+	public void setCarreraNotifier(Semaphore carreraNotifier) {
+		this.carreraNotifier = carreraNotifier;
+	}
 
 }
