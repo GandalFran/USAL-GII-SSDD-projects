@@ -18,6 +18,13 @@ public class Carrera100m extends Carrera{
 		return atletas;
 	}
 	
+	public static void Carrera(Atleta100m atleta){
+		atleta.getMeta().acquire();
+		System.out.printf("\n[%s] tiempo: %d", atleta.getDorsal(), System.currentTimeMillis());
+		System.out.flush();
+		atleta.getMeta().release();
+	}
+	
 	public static void correr(Atleta100m [] atletas) {
 		try {
 			System.out.println("preparados");
