@@ -21,9 +21,7 @@ public class Atleta100m extends Atleta{
 		try {
 			this.inicio.acquire();
 			this.correr();
-			this.meta.acquire();
-			System.out.printf("\n[%s] tiempo: %d", this.dorsal, System.currentTimeMillis());
-			this.meta.release();
+			Carrera.meta(this);
 		} catch (InterruptedException ex) {
 			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + ex.toString());
 		}
