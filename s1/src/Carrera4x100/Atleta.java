@@ -5,8 +5,8 @@ import java.util.concurrent.Semaphore;
 
 public class Atleta extends Thread{
 
-	private static final int MIN_SLEEP_MS = 9;
-	private static final int MAX_SLEEP_MS = 11;
+	private static final int MIN_SLEEP_MS = 9000;
+	private static final int MAX_SLEEP_MS = 11000;
 
 	protected String dorsal;
 	private Semaphore testigo;
