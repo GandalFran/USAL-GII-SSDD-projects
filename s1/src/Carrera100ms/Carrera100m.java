@@ -25,7 +25,7 @@ public class Carrera100m extends Carrera{
 		} catch (InterruptedException ex) {
 			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + ex.toString());
 		}
-		System.out.printf("\n[%s] tiempo: %d", atleta.getDorsal(), System.currentTimeMillis());
+		System.out.printf("\n%s tarda %d", atleta.getDorsal(), System.currentTimeMillis());
 		System.out.flush();
 		atleta.getMeta().release();
 		atleta.getCarreraNotifier().release(1);
