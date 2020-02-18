@@ -2,11 +2,18 @@ package services;
 
 public class main {
 
-	public static final String METHOD = "POST";
-	public static final String URL = "http://localhost:8080/api/v1/endpoint"
+	public static final String METHOD = "GET";
+	public static final String URL = "http://localhost:8081/s2/myAPI/service/test";
 	
 	public static void main(String [] args) {
-		TestServer t = new TestServer();
-		String response = t.test(URL, METHOD);
+		String response = null;
+		try {
+			response = new TestServer().test(URL, METHOD);
+		} catch (Exception e) {
+			System.err.println("Exception occured: " + e.toString());
+			e.printStackTrace();
+		}
+		
+		System.out.println("response " + response);
 	}
 }
