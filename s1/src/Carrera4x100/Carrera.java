@@ -3,11 +3,12 @@ import java.util.concurrent.Semaphore;
 
 public class Carrera{
 	
+	private final static Semaphore TESTIGO = new Semaphore(1);
+	
 	public static Atleta [] buildAtletas(int numAtletas) {
 		Atleta [] atletas = new Atleta[numAtletas];
-		Semaphore testigo = new Semaphore(1);
 		for(int id = 0; id < numAtletas; id++)
-			atletas[id] = new Atleta(String.format("Atleta %d",id), testigo);
+			atletas[id] = new Atleta(String.format("Atleta %d",id), TESTIGO);
 		return atletas;
 	}
 	
