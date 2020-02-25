@@ -1,17 +1,24 @@
-package Carrera;
+package service;
 
-import java.security.KeyStore.Entry;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.Semaphore;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.BrokenBarrierException;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.inject.Singleton;
+import javax.ws.rs.core.MediaType;
 
 
+@Singleton
+@Path("/carrera100")
 public class Carrera100 {
 
 	private static final int NUM_ATLETAS = 4;
@@ -31,6 +38,19 @@ public class Carrera100 {
 		this.barreraPreparado = new CyclicBarrier(NUM_ATLETAS);
 	}
 	
+	public static Carrera100 buildProxy(String hostUri) {
+		return new Carrera100Proxy(hostUri);
+	}
+	
+	@GET
+	@Produces(MediaType.TEXT_PLAIN)
+	@Path("/test")
+	public String hola() {
+		return "hello";
+	}
+	
+	@POST
+	@Path("/reinicio")
 	public void reinicio() {
 		this.tiempoInicio = 0;
 		this.tiemposLlegada.clear();
@@ -39,6 +59,8 @@ public class Carrera100 {
 		this.barreraPreparado = new CyclicBarrier(NUM_ATLETAS);
 	}
 	
+	@POST
+	@Path("/preparado")
 	public void preparado() {
 		try {
 			this.barreraPreparado.await();
@@ -47,6 +69,8 @@ public class Carrera100 {
 		}
 	}
 	
+	@POST
+	@Path("/listo")
 	public void listo() {
 		try {
 			this.barreraListo.await();
@@ -55,14 +79,20 @@ public class Carrera100 {
 		}
 	}
 	
-	public long llegada(String dorsal) {
+	@GET
+	@Path("/llegada")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String llegada(@QueryParam(value="dorsal") String dorsal) {
 		long time = 0;
 		time = System.currentTimeMillis();
 		this.tiemposLlegada.put(dorsal, time);
 		this.semaforoEsperarResultados.release(1);
-		return time;
+		return new Long(time).toString();
 	}
 	
+	@GET
+	@Path("/resultados")
+	@Produces(MediaType.TEXT_PLAIN)
 	public String resultados() {
 		try {
 			this.semaforoEsperarResultados.acquire(NUM_ATLETAS);
@@ -79,7 +109,7 @@ public class Carrera100 {
 		return sb.toString();
 	}
 	
-	// src: https://stackoverflow.com/questions/109383/sort-a-mapkey-value-by-valuesa
+	// source: https://stackoverflow.com/questions/109383/sort-a-mapkey-value-by-values
 	private Map<String, Long> sortmap(Map<String, Long> map) {
 		return map.entrySet()
                 .stream()

@@ -7,12 +7,12 @@
     
     <init-param>
       <param-name>jersey.config.server.provider.packages</param-name>
-      <param-value>services</param-value> 
+      <param-value>service</param-value> 
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>Jersey REST Service</servlet-name>
-    <url-pattern>/myAPI/*</url-pattern>
+    <url-pattern>/*</url-pattern>
   </servlet-mapping>
 </web-app>

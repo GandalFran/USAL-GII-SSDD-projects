@@ -1,4 +1,4 @@
-package Carrera;
+package service;
 
 import java.util.Random;
 
@@ -9,12 +9,12 @@ public class Atleta extends Thread{
 	private static final int MAX_SLEEP_MS = 11000;
 	
 	private String dorsal;
-	private Carrera100Proxy carrera;
+	private Carrera100 carrera;
 
-	public Atleta(String dorsal) {
+	public Atleta(String dorsal, Carrera100 carrera) {
 		super();
 		this.dorsal = dorsal;
-		this.carrera = new Carrera100Proxy();
+		this.carrera = carrera;
 	}
 
 	public String getDorsal() {
