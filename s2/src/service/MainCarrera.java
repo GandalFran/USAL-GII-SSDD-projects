@@ -3,12 +3,10 @@ package service;
 public class MainCarrera {
 
 	public static void main(String [] args) {
-		/* TODO: 
-		 * String hostUri = args[1];
-		 */
-		int numAtletas = 4;
-		String hostUri = "http://localhost:8081/s2/carrera100";
-		MainCarrera.doCarrera(hostUri, numAtletas);
+		int numAtletasToRun = Integer.parseInt(args[0]);
+		String hostUri = args[1];
+		//String hostUri = "http://localhost:8081/s2/carrera100";
+		MainCarrera.doCarrera(hostUri, numAtletasToRun);
 	}
 	
 	private static Atleta[] buildAtletas(int numAtletas, Carrera100Proxy carrera) {
