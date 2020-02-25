@@ -44,9 +44,9 @@ public class Carrera100 {
 	
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
-	@Path("/test")
+	@Path("/status")
 	public String hola() {
-		return "hello";
+		return "{\"status\": \"ok\"}";
 	}
 	
 	@POST
