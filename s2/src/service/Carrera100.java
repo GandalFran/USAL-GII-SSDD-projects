@@ -21,7 +21,7 @@ import javax.ws.rs.core.MediaType;
 @Path("/carrera100")
 public class Carrera100 {
 
-	private static final int NUM_HOSTS = 1;
+	private static final int NUM_HOSTS = 2;
 
 	private int numAtletas;
 	private long tiempoInicio;
