@@ -8,11 +8,9 @@ import javax.ws.rs.core.MediaType;
 
 public class Carrera100Proxy extends Carrera100{
 	
-	private String hostUri;
 	private WebTarget service;
 	
 	public Carrera100Proxy(String hostUri) {
-		this.hostUri = hostUri;
 		this.service = ClientBuilder.newClient().target(UriBuilder.fromUri(hostUri).build());
 	}
 	
