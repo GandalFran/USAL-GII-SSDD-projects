@@ -1,8 +1,6 @@
 package service;
 
 import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.stream.Collectors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +37,7 @@ public class Carrera100 {
 		this.tiemposLlegada = new ConcurrentHashMap<>();
 		this.semaforoEsperarResultados = new Semaphore(0);
 		this.semaforoRegistrarAtletas = new Semaphore(1);
-		this.barreraRegistro = new CyclicBarrier(this.NUM_HOSTS);
+		this.barreraRegistro = new CyclicBarrier(Carrera100.NUM_HOSTS);
 	}
 	
 	public static Carrera100 buildProxy(String hostUri) {

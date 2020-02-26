@@ -12,37 +12,45 @@
 #	server_path: :8081/s2/carrera100 ---> http:$HOST:8081/s2/carrera100
 # bash script.bash i0918455 172.20.1.1 172.20.1.2 /home/i0918455/Escritorio/s2.war /home/i0918455/Escritorio/s2.jar :8081/s2/carrera100
 
+user=i0918455
+
+server=$(hostname -I)
+host1=172.20.1.1
+host2=172.20.1.2
+
+clientFiles=/home/i0918455/Escritorio/s2.jar
+serverFiles=/home/i0918455/Escritorio/s2.war
+serverFinalDestinationFiles=/bin/apache/.../webapps
+
+numAtletasPerHost=4
+serviceUri="http://$(hostname -I):8081/s2/carrera100"
+
 prepareKeys(){
 	sh shareKeys.sh "$host1"
-	sh shareKeys.sh "$host1"
+	sh shareKeys.sh "$host2"
 }
 
-prepareFiles(){
+copyFiles(){
+	cp "$serverFiles" "$serverFinalDestinationFiles"
 	scp -r "$applicationFiles" "$user@$host1:$applicationFiles"
 	scp -r "$applicationFiles" "$user@$host2:$applicationFiles"
 }
 
 startServer(){
-	java -jar "$serverapplicationFiles"
+	java -jar "$serverFinalDestinationFiles"
 }
 
 startClients(){
-	MYSERVER=$(hostname -I)
-	java -jar "$applicationFiles $applicationFiles $num_atletas $server_uri $MYSERVER"
-	ssh "$user@$host1" "java -jar $applicationFiles $num_atletas $server_uri $host1"
-	#ssh "$user@$host2" "java -jar $applicationFiles $num_atletas $server_uri $host2"
+	java -jar "$applicationFiles" "$numAtletasPerHost" "$serviceUri" "$server"
+	ssh "$user@$host1" "java -jar $applicationFiles $numAtletasPerHost $serviceUri $host1"
+	#ssh "$user@$host2" "java -jar $applicationFiles $numAtletasPerHost $serviceUri $host2"
 }
 
-user=$1
-host1=$2
-host2=$3
-serverapplicationFiles=$4
-applicationFiles=$5
-num_atletas=$6
-server_path=$7
-server_uri="http://$(hostname -I):8081$server_path"
+if [ $# -eq 1 ]
+then
+	prepareKeys
+fi
 
-#prepareKeys
 prepareFiles
 startServer
 startClients
