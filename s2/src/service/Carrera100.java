@@ -21,21 +21,25 @@ import javax.ws.rs.core.MediaType;
 @Path("/carrera100")
 public class Carrera100 {
 
-	private static final int NUM_ATLETAS = 4;
+	private static final int NUM_HOSTS = 1;
 
+	private int numAtletas;
 	private long tiempoInicio;
 	private Map<String, Long> tiemposLlegada;
 
 	private CyclicBarrier barreraListo;
+	private CyclicBarrier barreraRegistro;
 	private CyclicBarrier barreraPreparado;
 	private Semaphore semaforoEsperarResultados;
+	private Semaphore semaforoRegistrarAtletas;
 
 	public Carrera100() {
+		this.numAtletas = 0;
 		this.tiempoInicio = 0;
 		this.tiemposLlegada = new ConcurrentHashMap<>();
 		this.semaforoEsperarResultados = new Semaphore(0);
-		this.barreraListo = new CyclicBarrier(NUM_ATLETAS);
-		this.barreraPreparado = new CyclicBarrier(NUM_ATLETAS);
+		this.semaforoRegistrarAtletas = new Semaphore(1);
+		this.barreraRegistro = new CyclicBarrier(this.NUM_HOSTS);
 	}
 	
 	public static Carrera100 buildProxy(String hostUri) {
@@ -49,14 +53,26 @@ public class Carrera100 {
 		return "{\"status\": \"ok\"}";
 	}
 	
-	@POST
+	
+	@GET
 	@Path("/reinicio")
-	public void reinicio() {
+	public void reinicio(@QueryParam(value="atletas") String atletas) {
 		this.tiempoInicio = 0;
 		this.tiemposLlegada.clear();
 		this.semaforoEsperarResultados = new Semaphore(0);
-		this.barreraListo = new CyclicBarrier(NUM_ATLETAS);
-		this.barreraPreparado = new CyclicBarrier(NUM_ATLETAS);
+		try {
+			this.barreraRegistro.await();
+			this.semaforoRegistrarAtletas.acquire();
+			this.numAtletas += Integer.parseInt(atletas);
+			this.semaforoRegistrarAtletas.release();
+			this.barreraRegistro.await();
+			this.barreraListo = new CyclicBarrier(this.numAtletas);
+			this.barreraPreparado = new CyclicBarrier(this.numAtletas);
+			this.barreraRegistro.await();
+		} catch (InterruptedException | BrokenBarrierException e) {
+			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + e.toString());
+		}
+		this.barreraRegistro.reset();
 	}
 	
 	@POST
@@ -95,7 +111,7 @@ public class Carrera100 {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String resultados() {
 		try {
-			this.semaforoEsperarResultados.acquire(NUM_ATLETAS);
+			this.semaforoEsperarResultados.acquire(this.numAtletas);
 		} catch (InterruptedException e) {	
 			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + e.toString());
 		}
@@ -111,9 +127,13 @@ public class Carrera100 {
 	
 	// source: https://stackoverflow.com/questions/109383/sort-a-mapkey-value-by-values
 	private Map<String, Long> sortmap(Map<String, Long> map) {
+		return map;
+		/*
+		 * Commented because it doesn't work in java 7
 		return map.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+    	*/
     }
 }
