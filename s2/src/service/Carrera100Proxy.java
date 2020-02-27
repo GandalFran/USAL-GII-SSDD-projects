@@ -16,26 +16,48 @@ public class Carrera100Proxy extends Carrera100{
 	
 	@Override
 	public void reinicio() {
-		this.service.path("reinicio").request().post(null);
+		try {
+			this.service.path("reinicio").request().post(null);
+		} catch (Exception ex) {
+			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + ex.toString());
+		}
 	}
 
 	@Override
-	public void preparado() {		
-		this.service.path("preparado").request().post(null);
+	public void preparado() {
+		try {
+			this.service.path("preparado").request().post(null);
+		} catch (Exception ex) {
+			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + ex.toString());
+		}
 	}
 
 	@Override
 	public void listo() {
-		this.service.path("listo").request().post(null);
+		try {
+			this.service.path("listo").request().post(null);
+		} catch (Exception ex) {
+			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + ex.toString());
+		}
 	}
 
 	@Override
 	public String llegada(String dorsal) {
-		return this.service.path("llegada").queryParam("dorsal", dorsal).request(MediaType.TEXT_PLAIN).get(String.class);
+		try {
+			return this.service.path("llegada").queryParam("dorsal", dorsal).request(MediaType.TEXT_PLAIN).get(String.class);
+		} catch (Exception ex) {
+			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + ex.toString());
+			return null;
+		}
 	}
 
 	@Override
 	public String resultados() {
-		return this.service.path("resultados").request(MediaType.TEXT_PLAIN).get(String.class);
+		try {
+			return this.service.path("resultados").request(MediaType.TEXT_PLAIN).get(String.class);
+		} catch (Exception ex) {
+			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + ex.toString());
+			return null;
+		}
 	}
 }

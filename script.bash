@@ -1,59 +1,83 @@
 #!/bin/bash
 
-# example:
-# NOTA: 2 atletas por host
-# args:
-#	user: i0918455
-#	host1: 172.20.1.1
-#	host2: 172.20.1.2
-#	serverapplicationFiles: /home/i0918455/Escritorio/s2.war
-#	applicationFiles: /home/i0918455/Escritorio/s2.jsar
-#	num_atletas: 2 (2 por host)
-#	server_path: :8081/s2/carrera100 ---> http:$HOST:8081/s2/carrera100
-# bash script.bash i0918455 172.20.1.1 172.20.1.2 /home/i0918455/Escritorio/s2.war /home/i0918455/Escritorio/s2.jar :8081/s2/carrera100
-
-user=i0918455
-
-server=$(hostname -I)
-host1=172.20.1.1
-host2=172.20.1.2
-
-clientFiles=/home/i0918455/Escritorio/s2.jar
-clientDependencies=/home/i0918455/Escritorio/s2_lib
-serverFiles=/home/i0918455/Escritorio/s2.war
-serverFinalDestinationFiles=/bin/apache/.../webapps
-
-numAtletasPerHost=4
-serviceUri="http://$(hostname -I):8081/s2/carrera100"
-
-prepareKeys(){
-	sh shareKeys.sh "$host1"
-	sh shareKeys.sh "$host2"
+gen_key(){
+	ssh-keygen -t rsa	
 }
 
-copyFiles(){
-	cp "$serverFiles" "$serverFinalDestinationFiles"
-	scp -r "$clientFiles" "$user@$host1:$clientFiles"
-	scp -r "$clientFiles" "$user@$host2:$clientFiles"
-	scp -r "$clientDependencies" "$user@$host1:$clientDependencies"
-	scp -r "$clientDependencies" "$user@$host2:$clientDependencies"
+
+share_key(){
+	user=$1
+	host=$2
+	ssh-copy-id -i $HOME/.ssh/id_rsa.pub $user@$host
 }
 
-startServer(){
-	java -jar "$serverFinalDestinationFiles"
+copy_files(){
+	user=$1
+	host=$2
+	initial=$3
+	final=$3
+	scp -rq $initial $user@$host:$final
 }
 
-startClients(){
-	java -jar "$clientFiles" "$numAtletasPerHost" "$serviceUri" "$server" "true"
-	ssh "$user@$host1" "java -jar $clientFiles $numAtletasPerHost $serviceUri $host1" "false"
-	#ssh "$user@$host2" "java -jar $clientFiles $numAtletasPerHost $serviceUri $host2"  "false"
+remote_exec(){
+	user=$1
+	host=$2
+	command=$3
+	ssh $user@$host "$command"
 }
 
-if [ $# -eq 1 ]
+# constants
+user=root
+
+server=192.168.1.43
+client1=192.168.1.47
+client2=192.168.1.49
+
+tomcat7_path=/opt/tomcat7
+
+client_jar_initial=s2.jar
+server_war_initial=s2.war
+client_jar_final=/root/s2.jar
+server_war_final=$tomcat7_path/webapps/s2.war
+
+num_atletas=2
+service_uri=http://$server:8080/s2/carrera100
+
+# application
+
+if [ $# -eq 2 ] && [ $1 = "--session" ]
 then
-	prepareKeys
+	if [ $2 = "--genkey" ]
+	then
+		echo "generating keys ..."
+		gen_key
+	fi
+	echo "sharing keys ..."
+	share_key $user $server
+	share_key $user $client1
+	share_key $user $client2
 fi
 
-prepareFiles
-startServer
-startClients
+# copy files
+echo "copying server files ..."
+sudo cp $server_war_initial $server_war_final
+echo "copying files in remotes ..."
+copy_files $user $client1 $client_jar_initial $client_jar_final
+copy_files $user $client2 $client_jar_initial $client_jar_final
+
+# wait to .war to deploy
+echo "wait 5 seconds for server to deploy copied .war file properly..."
+sleep 7
+
+# start clients
+echo "starting server client ..."
+remote_exec $user $server "java -jar $client_jar_final $service_uri $num_atletas server_$server true" &
+
+# sleep 2 second to allow server client to restart
+sleep 2
+
+echo "starting client 1 ..."
+remote_exec $user $client1 "java -jar $client_jar_final $service_uri $num_atletas client1_$client1 false" &
+
+echo "starting client 2 ..."
+remote_exec $user $client2 "java -jar $client_jar_final $service_uri $num_atletas client2_$client2 false"

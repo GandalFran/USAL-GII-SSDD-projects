@@ -1,12 +1,15 @@
-package service;
+package client;
 
+import service.Atleta;
+import service.Carrera100;
+import service.Carrera100Proxy;
 
 public class MainCarrera {
 
 	//ServiceUri: http://YOUR_IP:8081/s2/carrera100
 	public static void main(String [] args) {
-		int numAtletasToRun = Integer.parseInt(args[0]);
-		String serviceUri = args[1];
+		String serviceUri = args[0];
+		int numAtletasToRun = Integer.parseInt(args[1]);
 		String hostId = args[2];
 		boolean isCarreraController = Boolean.parseBoolean(args[3]);
 		MainCarrera.doCarrera(serviceUri, hostId, numAtletasToRun, isCarreraController);

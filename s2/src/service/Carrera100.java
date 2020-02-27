@@ -27,7 +27,7 @@ public class Carrera100 {
 	private CyclicBarrier barreraPreparado;
 	private Semaphore semaforoEsperarResultados;
 
-	private final static int DEFAULT_NUM_ATLETAS = 4;
+	private final static int DEFAULT_NUM_ATLETAS = 6;
 	
 	public Carrera100() {
 		this.numAtletas = DEFAULT_NUM_ATLETAS;
@@ -37,15 +37,6 @@ public class Carrera100 {
 		this.barreraListo = new CyclicBarrier(this.numAtletas);
 		this.barreraPreparado = new CyclicBarrier(this.numAtletas);
 	}
-	
-	public Carrera100(int numAtletas) {
-		this.numAtletas = numAtletas;
-		this.tiempoInicio = 0;
-		this.tiemposLlegada = new ConcurrentHashMap<>();
-		this.semaforoEsperarResultados = new Semaphore(0);
-		this.barreraListo = new CyclicBarrier(this.numAtletas);
-		this.barreraPreparado = new CyclicBarrier(this.numAtletas);
-	}	
 	
 	
 	public static Carrera100 buildProxy(String hostUri) {
@@ -95,11 +86,10 @@ public class Carrera100 {
 	@Path("/llegada")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String llegada(@QueryParam(value="dorsal") String dorsal) {
-		long time = 0;
-		time = System.currentTimeMillis();
+		Long time = new Long(System.currentTimeMillis());
 		this.tiemposLlegada.put(dorsal, time);
 		this.semaforoEsperarResultados.release(1);
-		return new Long(time).toString();
+		return time.toString();
 	}
 	
 	@GET
@@ -113,24 +103,18 @@ public class Carrera100 {
 			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + e.toString());
 		}
 		
+	
 		StringBuilder sb = new StringBuilder();
-		for(String atleta : this.sortmap(this.tiemposLlegada).keySet()) {
-			float time = (this.tiemposLlegada.get(atleta) - this.tiempoInicio)/1000;
-			sb.append(atleta).append(" - ").append(String.format("%.3f", time)).append("\n");
+		sb.append("+==========================================+===============+===============+===========+").append("\n");
+		sb.append(String.format("| %40s | %13s | %13s | %9s |", "dorsal", "inicio", "fin", "tiempo")).append("\n");
+		sb.append("+==========================================+===============+===============+===========+").append("\n");
+		for(String atleta : this.tiemposLlegada.keySet()) {
+			long timeInterval = this.tiemposLlegada.get(atleta).longValue() - this.tiempoInicio;
+			float time = ((float)timeInterval)/1000;
+			sb.append(String.format("| %40s | %13d | %13d | %9f |", atleta, this.tiempoInicio, this.tiemposLlegada.get(atleta).longValue(), time )).append("\n");
 		}
+		sb.append("+==========================================+===============+===============+===========+").append("\n");
 		
 		return sb.toString();
 	}
-	
-	// source: https://stackoverflow.com/questions/109383/sort-a-mapkey-value-by-values
-	private Map<String, Long> sortmap(Map<String, Long> map) {
-		return map;
-		/*
-		 * Commented because it doesn't work in java 7
-		return map.entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByValue())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-    	*/
-    }
 }
