@@ -19,26 +19,34 @@ import javax.ws.rs.core.MediaType;
 @Path("/carrera100")
 public class Carrera100 {
 
-	private static final int NUM_HOSTS = 2;
-
 	private int numAtletas;
 	private long tiempoInicio;
 	private Map<String, Long> tiemposLlegada;
 
 	private CyclicBarrier barreraListo;
-	private CyclicBarrier barreraRegistro;
 	private CyclicBarrier barreraPreparado;
 	private Semaphore semaforoEsperarResultados;
-	private Semaphore semaforoRegistrarAtletas;
 
+	private final static int DEFAULT_NUM_ATLETAS = 4;
+	
 	public Carrera100() {
-		this.numAtletas = 0;
+		this.numAtletas = DEFAULT_NUM_ATLETAS;
 		this.tiempoInicio = 0;
 		this.tiemposLlegada = new ConcurrentHashMap<>();
 		this.semaforoEsperarResultados = new Semaphore(0);
-		this.semaforoRegistrarAtletas = new Semaphore(1);
-		this.barreraRegistro = new CyclicBarrier(Carrera100.NUM_HOSTS);
+		this.barreraListo = new CyclicBarrier(this.numAtletas);
+		this.barreraPreparado = new CyclicBarrier(this.numAtletas);
 	}
+	
+	public Carrera100(int numAtletas) {
+		this.numAtletas = numAtletas;
+		this.tiempoInicio = 0;
+		this.tiemposLlegada = new ConcurrentHashMap<>();
+		this.semaforoEsperarResultados = new Semaphore(0);
+		this.barreraListo = new CyclicBarrier(this.numAtletas);
+		this.barreraPreparado = new CyclicBarrier(this.numAtletas);
+	}	
+	
 	
 	public static Carrera100 buildProxy(String hostUri) {
 		return new Carrera100Proxy(hostUri);
@@ -52,25 +60,14 @@ public class Carrera100 {
 	}
 	
 	
-	@GET
+	@POST
 	@Path("/reinicio")
-	public void reinicio(@QueryParam(value="atletas") String atletas) {
+	public void reinicio() {
 		this.tiempoInicio = 0;
 		this.tiemposLlegada.clear();
 		this.semaforoEsperarResultados = new Semaphore(0);
-		try {
-			this.barreraRegistro.await();
-			this.semaforoRegistrarAtletas.acquire();
-			this.numAtletas += Integer.parseInt(atletas);
-			this.semaforoRegistrarAtletas.release();
-			this.barreraRegistro.await();
-			this.barreraListo = new CyclicBarrier(this.numAtletas);
-			this.barreraPreparado = new CyclicBarrier(this.numAtletas);
-			this.barreraRegistro.await();
-		} catch (InterruptedException | BrokenBarrierException e) {
-			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + e.toString());
-		}
-		this.barreraRegistro.reset();
+		this.barreraListo = new CyclicBarrier(this.numAtletas);
+		this.barreraPreparado = new CyclicBarrier(this.numAtletas);
 	}
 	
 	@POST
@@ -91,6 +88,7 @@ public class Carrera100 {
 		} catch (InterruptedException | BrokenBarrierException e) {	
 			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + e.toString());
 		}
+		this.tiempoInicio = System.currentTimeMillis();
 	}
 	
 	@GET
@@ -110,14 +108,15 @@ public class Carrera100 {
 	public String resultados() {
 		try {
 			this.semaforoEsperarResultados.acquire(this.numAtletas);
+			this.semaforoEsperarResultados.release(this.numAtletas);
 		} catch (InterruptedException e) {	
 			System.err.println("["+ Thread.currentThread().getId()+"] An error occurred in " + e.toString());
 		}
 		
 		StringBuilder sb = new StringBuilder();
 		for(String atleta : this.sortmap(this.tiemposLlegada).keySet()) {
-			long time = this.tiemposLlegada.get(atleta) - this.tiempoInicio;
-			sb.append(atleta).append(" - ").append(time).append("\n");
+			float time = (this.tiemposLlegada.get(atleta) - this.tiempoInicio)/1000;
+			sb.append(atleta).append(" - ").append(String.format("%.3f", time)).append("\n");
 		}
 		
 		return sb.toString();

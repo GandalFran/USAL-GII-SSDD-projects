@@ -15,8 +15,8 @@ public class Carrera100Proxy extends Carrera100{
 	}
 	
 	@Override
-	public void reinicio(String atletas) {
-		this.service.path("reinicio").queryParam("atletas", atletas).request().get();
+	public void reinicio() {
+		this.service.path("reinicio").request().post(null);
 	}
 
 	@Override

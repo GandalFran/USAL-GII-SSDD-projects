@@ -1,15 +1,15 @@
 package service;
 
-import java.util.Arrays;
 
 public class MainCarrera {
 
+	//ServiceUri: http://YOUR_IP:8081/s2/carrera100
 	public static void main(String [] args) {
 		int numAtletasToRun = Integer.parseInt(args[0]);
-		String hostUri = args[1];
+		String serviceUri = args[1];
 		String hostId = args[2];
-		//String hostUri = "http://localhost:8081/s2/carrera100";
-		MainCarrera.doCarrera(hostUri, hostId, numAtletasToRun);
+		boolean isCarreraController = Boolean.parseBoolean(args[3]);
+		MainCarrera.doCarrera(serviceUri, hostId, numAtletasToRun, isCarreraController);
 	}
 	
 	private static Atleta[] buildAtletas(String hostId, int numAtletas, Carrera100Proxy carrera) {
@@ -20,13 +20,17 @@ public class MainCarrera {
 		return atletas;
 	}
 	
-	public static void doCarrera(String hostUri, String hostId, int numAtletas) {
-		Carrera100Proxy carrera = (Carrera100Proxy) Carrera100.buildProxy(hostUri);
+	public static void doCarrera(String serviceUri, String hostId, int numAtletas, boolean isCarreraController) {
+		Carrera100Proxy carrera = (Carrera100Proxy) Carrera100.buildProxy(serviceUri);
 		Atleta [] atletas = MainCarrera.buildAtletas(hostId, numAtletas, carrera);
-		carrera.reinicio(String.format("%d",numAtletas));
+		if(isCarreraController) {
+			carrera.reinicio();
+		}
 		for(Atleta a : atletas)
 			a.start();
 		String resultados = carrera.resultados();
-		System.out.println(resultados);
+		if(isCarreraController) {
+			System.out.println(resultados);
+		}
 	}
 }

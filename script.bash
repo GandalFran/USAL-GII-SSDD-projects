@@ -19,6 +19,7 @@ host1=172.20.1.1
 host2=172.20.1.2
 
 clientFiles=/home/i0918455/Escritorio/s2.jar
+clientDependencies=/home/i0918455/Escritorio/s2_lib
 serverFiles=/home/i0918455/Escritorio/s2.war
 serverFinalDestinationFiles=/bin/apache/.../webapps
 
@@ -32,8 +33,10 @@ prepareKeys(){
 
 copyFiles(){
 	cp "$serverFiles" "$serverFinalDestinationFiles"
-	scp -r "$applicationFiles" "$user@$host1:$applicationFiles"
-	scp -r "$applicationFiles" "$user@$host2:$applicationFiles"
+	scp -r "$clientFiles" "$user@$host1:$clientFiles"
+	scp -r "$clientFiles" "$user@$host2:$clientFiles"
+	scp -r "$clientDependencies" "$user@$host1:$clientDependencies"
+	scp -r "$clientDependencies" "$user@$host2:$clientDependencies"
 }
 
 startServer(){
@@ -41,9 +44,9 @@ startServer(){
 }
 
 startClients(){
-	java -jar "$applicationFiles" "$numAtletasPerHost" "$serviceUri" "$server"
-	ssh "$user@$host1" "java -jar $applicationFiles $numAtletasPerHost $serviceUri $host1"
-	#ssh "$user@$host2" "java -jar $applicationFiles $numAtletasPerHost $serviceUri $host2"
+	java -jar "$clientFiles" "$numAtletasPerHost" "$serviceUri" "$server" "true"
+	ssh "$user@$host1" "java -jar $clientFiles $numAtletasPerHost $serviceUri $host1" "false"
+	#ssh "$user@$host2" "java -jar $clientFiles $numAtletasPerHost $serviceUri $host2"  "false"
 }
 
 if [ $# -eq 1 ]
