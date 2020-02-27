@@ -66,7 +66,7 @@ copy_files $user $client1 $client_jar_initial $client_jar_final
 copy_files $user $client2 $client_jar_initial $client_jar_final
 
 # wait to .war to deploy
-echo "wait 5 seconds for server to deploy copied .war file properly..."
+echo "wait 7 seconds for server to deploy copied .war file properly..."
 sleep 7
 
 # start clients
