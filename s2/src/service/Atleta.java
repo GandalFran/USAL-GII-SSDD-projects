@@ -5,8 +5,8 @@ import java.util.Random;
 
 public class Atleta extends Thread{
 
-	private static final int MIN_SLEEP_MS = 9000;
-	private static final int MAX_SLEEP_MS = 11000;
+	private static final int MIN_SLEEP_MS = 9560;
+	private static final int MAX_SLEEP_MS = 11760;
 	
 	private String dorsal;
 	private Carrera100 carrera;

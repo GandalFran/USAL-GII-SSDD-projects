@@ -4,19 +4,10 @@ gen_key(){
 	ssh-keygen -t rsa	
 }
 
-
 share_key(){
 	user=$1
 	host=$2
 	ssh-copy-id -i $HOME/.ssh/id_rsa.pub $user@$host
-}
-
-copy_files(){
-	user=$1
-	host=$2
-	initial=$3
-	final=$3
-	scp -rq $initial $user@$host:$final
 }
 
 remote_exec(){
@@ -24,6 +15,23 @@ remote_exec(){
 	host=$2
 	command=$3
 	ssh $user@$host "$command"
+}
+
+copy_files(){
+	user=$1
+	host=$2
+	initial=$3
+	final=$3
+	scp -q $initial $user@$host:$final
+}
+
+copy_files_server(){
+	user=$1
+	host=$2
+	initial=$3
+	final=$4
+	scp -q $initial $user@$host:/tmp/files_server_tmp
+	remote_exec $user $host "sudo cp /tmp/files_server_tmp $final"
 }
 
 # constants
@@ -60,8 +68,8 @@ fi
 
 # copy files
 echo "copying server files ..."
-sudo cp $server_war_initial $server_war_final
-echo "copying files in remotes ..."
+copy_files_server $user $server_war_initial $server_war_final
+echo "copying clients files ..."
 copy_files $user $client1 $client_jar_initial $client_jar_final
 copy_files $user $client2 $client_jar_initial $client_jar_final
 
