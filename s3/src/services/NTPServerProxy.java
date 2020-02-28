@@ -26,7 +26,7 @@ public class NTPServerProxy extends NTPServer{
 	}
 	
 	public static long[] parsePedirTiempoResponse(String response) {
-		String [] splittedresponse = response.split("|");
+		String [] splittedresponse = response.split("_");
 		return new long [] {Long.parseLong(splittedresponse[0]), Long.parseLong(splittedresponse[1]) };
 	}
 

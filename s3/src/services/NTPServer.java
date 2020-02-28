@@ -38,7 +38,7 @@ public class NTPServer {
 		}
 		long time2 = System.currentTimeMillis();
 		
-		return String.format("%d|%d", time1, time2);
+		return String.format("%d_%d", time1, time2);
 	}
 	
 	

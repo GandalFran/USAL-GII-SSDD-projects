@@ -5,7 +5,7 @@ public class NTPMarzulloClient extends NTPClient{
 	
 	@Override
 	protected Pair selectBestPair(Pair [] pairs) {
-		return null;
+		return new Pair(1,2.3);
 	}
 	
 }

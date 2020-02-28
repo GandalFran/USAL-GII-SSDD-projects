@@ -8,8 +8,8 @@ import services.NTPServerProxy;;
 
 public class Main {
 
-	public static NTPClient buildClient(boolean runMarzullo) {
-		if(runMarzullo)
+	public static NTPClient buildClient(boolean isMarzullo) {
+		if(isMarzullo)
 			return new NTPMarzulloClient();
 		else
 			return new NTPClient();
@@ -49,13 +49,26 @@ public class Main {
 		boolean runMarzullo = Boolean.parseBoolean(args[1]);
 		String [] serviceUris = Arrays.copyOfRange(args, 2, args.length);
 		
-		NTPClient client = Main.buildClient(runMarzullo);
+		NTPClient client = Main.buildClient(false);
+		NTPClient marzullo = Main.buildClient(true);
 		NTPServer [] servers = Main.buildServers(serviceUris);
 		
+		// run client
 		Map<NTPServer, Pair>result = client.estimate(servers, numIterations);
 		String resultStr = Main.formatResult(result);
-		System.out.println(resultStr);		
+
+		// run marzullo client (if neccesary)
+		String marzulloResultStr = "";
+		if(runMarzullo) {
+			Map<NTPServer, Pair> marzulloResult = marzullo.estimate(servers, numIterations);
+			marzulloResultStr = Main.formatResult(marzulloResult);
+		}
 		
+		// print results
+		System.out.print("Classic par selection result");
+		System.out.println(resultStr);
+		System.out.print("Marzullo par selection result");
+		System.out.println(marzulloResultStr);
 	}
 }
 
