@@ -1,6 +1,6 @@
 package client;
 
-public class Pair {
+public class Pair implements Comparable<Pair>{
 	
 	private double delay;
 	private double offset;
@@ -22,5 +22,10 @@ public class Pair {
 	}
 	public void setDelay(double delay) {
 		this.delay = delay;
+	}
+
+	@Override
+	public int compareTo(Pair p) {
+		return Double.compare(this.offset, p.offset);
 	}
 }
