@@ -34,7 +34,7 @@ public class Main {
 		sb.append("\n").append(String.format("| %50s | %20s | %30s |", "uri", "delay", "offset"));
 		sb.append("\n").append(separator);
 		for(NTPServer server : result.keySet())
-			sb.append("\n").append( String.format("| %50s | %20d | %30f |", 
+			sb.append("\n").append( String.format("| %50s | %20f | %30f |", 
 							((NTPServerProxy)server).getServiceUri(), 
 							result.get(server).getDelay(), 
 							result.get(server).getOffset()

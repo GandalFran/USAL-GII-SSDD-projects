@@ -36,8 +36,8 @@ public class NTPClient {
 		return ((double)(time1-time0+time2-time3))/2;
 	}
 	
-	private long calculateDelay(long time0, long time1, long time2, long time3) {
-		return (time1-time0+time3-time2);
+	private double calculateDelay(long time0, long time1, long time2, long time3) {
+		return ((double)(time1-time0+time3-time2));
 	}
 	
 	protected Pair selectBestPair(Pair [] pairs) {

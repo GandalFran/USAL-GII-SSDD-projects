@@ -28,6 +28,13 @@ public class NTPServer {
 	
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
+	@Path("/status")
+	public String hola() {
+		return "{\"status\": \"ok\"}";
+	}
+	
+	@GET
+	@Produces(MediaType.TEXT_PLAIN)
 	@Path("/pedirTiempo")
 	public String pedirTiempo() {
 		long time1 = System.currentTimeMillis(); 
