@@ -105,15 +105,15 @@ public class Carrera100 {
 		
 	
 		StringBuilder sb = new StringBuilder();
-		sb.append("+==========================================+===============+===============+===========+").append("\n");
-		sb.append(String.format("| %40s | %13s | %13s | %9s |", "dorsal", "inicio", "fin", "tiempo")).append("\n");
-		sb.append("+==========================================+===============+===============+===========+").append("\n");
+		sb.append("\n+==============================================================+===============+===============+===========+").append("\n");
+		sb.append(String.format("| %60s | %13s | %13s | %9s |", "dorsal", "inicio", "fin", "tiempo")).append("\n");
+		sb.append("+==============================================================+===============+===============+===========+").append("\n");
 		for(String atleta : this.tiemposLlegada.keySet()) {
 			long timeInterval = this.tiemposLlegada.get(atleta).longValue() - this.tiempoInicio;
 			float time = ((float)timeInterval)/1000;
-			sb.append(String.format("| %40s | %13d | %13d | %9f |", atleta, this.tiempoInicio, this.tiemposLlegada.get(atleta).longValue(), time )).append("\n");
+			sb.append(String.format("| %60s | %13d | %13d | %9f |", atleta, this.tiempoInicio, this.tiemposLlegada.get(atleta).longValue(), time )).append("\n");
 		}
-		sb.append("+==========================================+===============+===============+===========+").append("\n");
+		sb.append("+==============================================================+===============+===============+===========+").append("\n");
 		
 		return sb.toString();
 	}

@@ -6,7 +6,6 @@ import service.Carrera100Proxy;
 
 public class MainCarrera {
 
-	//ServiceUri: http://YOUR_IP:8081/s2/carrera100
 	public static void main(String [] args) {
 		String serviceUri = args[0];
 		int numAtletasToRun = Integer.parseInt(args[1]);

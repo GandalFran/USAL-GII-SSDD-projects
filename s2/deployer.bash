@@ -5,7 +5,7 @@
 # ================================================== #
 project_name=s2
 service=/carrera100
-tomcat7_path=/opt/tomcat7
+tomcat7_path=/home/i0901148/Escritorio/tomcat
 
 # other constants
 client_jar_initial=$project_name.jar
@@ -41,20 +41,10 @@ copy_files(){
 	scp -q $initial $user_host:$final
 }
 
-copy_files_server(){
+clean_file(){
 	user_host=$1
-	initial=$2
-	final=$3
-	copy_files $user_host $initial "/tmp/files_server_tmp"
-	remote_exec $user_host "sudo cp /tmp/files_server_tmp $final"
-}
-
-clean_files(){
-	user_host=$1
-	client_final=$2
-	server_final=$3
-	remote_exec $user_host "sudo rm $client_final"
-	remote_exec $user_host "sudo rm -rf $server_final"
+	file=$2
+	remote_exec $user_host "rm $file"
 }
 
 # ================================================== #
@@ -77,7 +67,8 @@ do
         	echo -e "SSDD deployer"
         	echo -e "\t-genkey: generates ssh key"
         	echo -e "\t-session <user>@<host>: copy ssh key in host"
-        	echo -e "\t-clean <user>@<host>: clean program files in host"
+        	echo -e "\t-cleanclient <user>@<host>: copy client files in host"
+        	echo -e "\t-cleanserver <user>@<host>: copy server files in host"
         	echo -e "\t-copyclient <user>@<host>: copy client files in host"
         	echo -e "\t-copyserver <user>@<host>: copy server files in host"
         	echo -e "\t-run <user>@<host> <server_ip> <num_atletas> <is_main_host>: run client in host"
@@ -93,37 +84,38 @@ do
         	echo -e "\t\tbash deployer.bash -run user@172.20.1.2 172.20.1.1 2 true"
       ;;
       "-genkey")
-			echo "genkey"
 			gen_key
       ;;
       "-session")
-			echo "session"
 			i=$((i+1))
 			user_host=${args[$i]}
 			share_key $user_host
       ;;
-      "-clean")
-			echo "clean"
+      "-cleanclient")
 			i=$((i+1))
 			user_host=${args[$i]}
-			clean_files $user_host $client_jar_final $server_war_final
+			clean_file $user_host $client_jar_final
+      ;;
+      "-cleanserver")
+			i=$((i+1))
+			user_host=${args[$i]}
+			clean_file $user_host $server_war_final
       ;;
       "-copyclient")
-			echo "client"
 			i=$((i+1))
 			user_host=${args[$i]}
 			copy_files $user_host $client_jar_initial $client_jar_final
       ;;
       "-copyserver")
-			echo "server"
 			i=$((i+1))
 			user_host=${args[$i]}
-			copy_files_server $user_host $server_war_initial $server_war_final
+			copy_files $user_host $server_war_initial $server_war_final
+			remote_exec $user_host "$tomcat7_path/bin/shutdown.sh"
+			remote_exec $user_host "$tomcat7_path/bin/startup.sh"
 			echo "wait 5 seconds for server to deploy copied .war file properly..."
 			sleep 5
       ;;
       "-run")
-			echo "run"	
 			i=$((i+1))
 			user_host=${args[$i]}
 			i=$((i+1))
@@ -133,7 +125,12 @@ do
 			i=$((i+1))
 			is_main_host=${args[$i]}
 			service_uri="http://$server_ip$service_path"
+
 			remote_exec $user_host "java -jar $client_jar_final $service_uri $num_atletas $user_host $is_main_host" &
+			if [ $is_main_host = "true" ]
+			then 
+				sleep 2
+			fi
       ;;
       *)
         	echo "ERROR: unknown command: $selected_command, run deployer.bash -h for help"
