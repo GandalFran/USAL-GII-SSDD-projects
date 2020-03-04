@@ -8,10 +8,10 @@ service=/ntp
 tomcat7_path=/home/i0901148/Escritorio/tomcat
 
 # other constants
-client_jar_initial=$project_name.jar
+client_jar_initial=../../../desktop/$project_name.jar
 client_jar_final=/tmp/$project_name.jar
 
-server_war_initial=$project_name.war
+server_war_initial=../../../desktop/$project_name.war
 server_war_final=$tomcat7_path/webapps/$project_name.war
 
 service_path=/$project_name$service
@@ -38,7 +38,7 @@ copy_files(){
 	user_host=$1
 	initial=$2
 	final=$3
-	scp -q $initial $user_host:$final
+	scp -rq $initial $user_host:$final
 }
 
 clean_file(){
@@ -49,16 +49,17 @@ clean_file(){
 
 deploy_tomcat(){
 	user_host=$1
-
 	tomcat_uri=https://apache.brunneis.com/tomcat/tomcat-7/v7.0.100/bin/apache-tomcat-7.0.100.tar.gz
-	tomcat_tmp=/tmp/apache-tomcat-7.0.100.tar.gz
 
 	# download tomcat
-	remote_exec $user_host "wget $tomcat_uri -O $tomcat_tmp"
+	wget $tomcat_uri
 	# unzip tomcat
-	remote_exec $user_host "tar -zxf $tomcat_tmp -C $tomcat7_path"
+	tar -zxf apache-tomcat-7.0.100.tar.gz
+	# copy files
+	copy_files $user_host apache-tomcat-7.0.100 $tomcat7_path
 	# rm tar.gz
-	remote_exec $user_host "rm $tomcat_tmp"
+	rm apache-tomcat-7.0.100.tar.gz
+	rm -rf apache-tomcat-7.0.100
 }	
 
 # ================================================== #
@@ -198,7 +199,7 @@ do
 			service_uri_3="http://$server_ip_3$service_path"
 
 			# run client
-			remote_exec $user_host "java -jar $client_jar_final $num_iterations $is_marzullo $service_uri_1 $service_uri_2 $service_uri_3"
+			remote_exec $user_client "java -jar $client_jar_final $num_iterations $is_marzullo $service_uri_1 $service_uri_2 $service_uri_3"
       ;;
       "-redeploy")
 			i=$((i+1))

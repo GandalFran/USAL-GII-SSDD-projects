@@ -13,8 +13,8 @@ public class MarzulloInterval implements Comparable<MarzulloInterval>{
 
 	public static MarzulloInterval[] buildMarzulloInterval(Pair p) {
 		return new MarzulloInterval [] {
-				new MarzulloInterval(p.getDelay()+p.getOffset(),+1),
-				new MarzulloInterval(p.getDelay()-p.getOffset(),-1)
+				new MarzulloInterval(p.getOffset()-(p.getDelay()/2),-1),
+				new MarzulloInterval(p.getOffset()+(p.getDelay()/2),+1)
 		};
 	}
 

@@ -13,8 +13,8 @@ import javax.ws.rs.core.MediaType;
 @Path("/ntp")
 public class NTPServer {
 	
-	private static final int MIN_SLEEP_MS = 1000;
-	private static final int MAX_SLEEP_MS = 3000;
+	private static final int MIN_SLEEP_MS = 500;
+	private static final int MAX_SLEEP_MS = 1000;
 
 	private Random generator;
 

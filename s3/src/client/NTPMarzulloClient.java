@@ -36,8 +36,8 @@ public class NTPMarzulloClient extends NTPClient{
 	}
 	
 	private Pair calculatePair(double bestStart, double bestEnd) {
-		double delay = (bestEnd - bestStart)/2;
-		double offset = bestEnd - delay;
+		double delay = bestEnd - bestStart;
+		double offset = (bestStart + bestEnd)/2;
 		return new Pair(delay, offset);
 	}
 }
